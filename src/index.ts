@@ -76,12 +76,12 @@ export default class ElectronAuth0Login {
         if (this.tokenProperties && timeToTokenExpiry(this.tokenProperties) > 60) {
             // We have a valid token - use it
             return this.tokenProperties.access_token;
+        }
+        if (this.useRefreshToken) {
 
-        } else if (this.useRefreshToken) {
             // See if we can use a refresh token
             const refreshToken = await keytar.getPassword(this.config.applicationName, 'refresh-token');
-
-            if (refreshToken) {
+            if (!refreshToken) return this.login()
                 try {
                     this.tokenProperties = await this.sendRefreshToken(refreshToken);
                     return this.tokenProperties.access_token;
@@ -92,13 +92,9 @@ export default class ElectronAuth0Login {
                     return this.login();
                 }
 
-            } else {
-                return this.login();
-            }
-
-        } else {
-            return this.login();
         }
+
+        return this.login();
     }
 
     private async sendRefreshToken(refreshToken: string): Promise<TokenProperties> {
@@ -139,7 +135,6 @@ export default class ElectronAuth0Login {
                 ...this.config.auth0Params
             });
 
-            console.log('remote', remote)
             const authWindow = new remote.BrowserWindow(this.windowConfig);
     
             authWindow.webContents.on('did-navigate' as any, (event: any, href: string) => {

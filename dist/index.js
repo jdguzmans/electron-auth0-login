@@ -55,27 +55,22 @@ class ElectronAuth0Login {
                 // We have a valid token - use it
                 return this.tokenProperties.access_token;
             }
-            else if (this.useRefreshToken) {
+            if (this.useRefreshToken) {
                 // See if we can use a refresh token
                 const refreshToken = yield keytar.getPassword(this.config.applicationName, 'refresh-token');
-                if (refreshToken) {
-                    try {
-                        this.tokenProperties = yield this.sendRefreshToken(refreshToken);
-                        return this.tokenProperties.access_token;
-                    }
-                    catch (err) {
-                        console.warn('electron-auth0-login: could not use refresh token, may have been revoked');
-                        keytar.deletePassword(this.config.applicationName, 'refresh-token');
-                        return this.login();
-                    }
+                if (!refreshToken)
+                    return this.login();
+                try {
+                    this.tokenProperties = yield this.sendRefreshToken(refreshToken);
+                    return this.tokenProperties.access_token;
                 }
-                else {
+                catch (err) {
+                    console.warn('electron-auth0-login: could not use refresh token, may have been revoked');
+                    keytar.deletePassword(this.config.applicationName, 'refresh-token');
                     return this.login();
                 }
             }
-            else {
-                return this.login();
-            }
+            return this.login();
         });
     }
     sendRefreshToken(refreshToken) {

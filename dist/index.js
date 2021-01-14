@@ -106,7 +106,7 @@ class ElectronAuth0Login {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
                 const authCodeUrl = `https://${this.config.auth0Domain}/authorize?` + qs_1.default.stringify(Object.assign({ audience: this.config.auth0Audience, scope: this.config.auth0Scopes, response_type: 'code', client_id: this.config.auth0ClientId, code_challenge: pkcePair.challenge, code_challenge_method: 'S256', redirect_uri: `https://${this.config.auth0Domain}/mobile` }, this.config.auth0Params));
-                const authWindow = new electron_1.BrowserWindow(this.windowConfig);
+                const authWindow = new electron_1.remote.BrowserWindow(this.windowConfig);
                 authWindow.webContents.on('did-navigate', (event, href) => {
                     const location = url_1.default.parse(href);
                     if (location.pathname == '/mobile') {

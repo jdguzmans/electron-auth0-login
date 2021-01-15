@@ -62,6 +62,9 @@ class ElectronAuth0Login {
                     return this.login();
                 try {
                     this.tokenProperties = yield this.sendRefreshToken(refreshToken);
+                    if (this.tokenProperties.refresh_token) {
+                        keytar.setPassword(this.config.applicationName, 'refresh-token', this.tokenProperties.refresh_token);
+                    }
                     return this.tokenProperties.access_token;
                 }
                 catch (err) {

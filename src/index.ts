@@ -78,12 +78,14 @@ export default class ElectronAuth0Login {
             return this.tokenProperties.access_token;
         }
         if (this.useRefreshToken) {
-
             // See if we can use a refresh token
             const refreshToken = await keytar.getPassword(this.config.applicationName, 'refresh-token');
             if (!refreshToken) return this.login()
                 try {
                     this.tokenProperties = await this.sendRefreshToken(refreshToken);
+                    if (this.tokenProperties.refresh_token) {
+                        keytar.setPassword(this.config.applicationName, 'refresh-token', this.tokenProperties.refresh_token);    
+                    }
                     return this.tokenProperties.access_token;
 
                 } catch (err) {

@@ -1,9 +1,10 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -32,7 +33,7 @@ class ElectronAuth0Login {
         this.tokenProperties = null;
         this.useRefreshToken = !!(config.useRefreshTokens && config.applicationName && keytar);
         if (config.windowConfig) {
-            this.windowConfig = Object.assign({}, this.windowConfig, config.windowConfig);
+            this.windowConfig = Object.assign(Object.assign({}, this.windowConfig), config.windowConfig);
         }
         if (config.useRefreshTokens && !config.applicationName) {
             console.warn('electron-auth0-login: cannot use refresh tokens without an application name');
@@ -68,7 +69,9 @@ class ElectronAuth0Login {
                     return this.tokenProperties.access_token;
                 }
                 catch (err) {
-                    console.warn('electron-auth0-login: could not use refresh token, may have been revoked');
+                    console.warn('electron-auth0-login: could not use refresh token, may have been revoked', err);
+                    if (err.name === 'RequestError')
+                        throw err;
                     keytar.deletePassword(this.config.applicationName, 'refresh-token');
                     return this.login();
                 }
@@ -139,7 +142,7 @@ function timeToTokenExpiry(tokenMeta) {
     return tokenMeta.created_time + tokenMeta.expires_in - getEpochSeconds();
 }
 function toTokenMeta(tokenResponse) {
-    return Object.assign({}, tokenResponse, { created_time: getEpochSeconds() });
+    return Object.assign(Object.assign({}, tokenResponse), { created_time: getEpochSeconds() });
 }
 function getEpochSeconds() {
     return Date.now() / 1000;

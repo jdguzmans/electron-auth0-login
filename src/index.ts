@@ -89,7 +89,11 @@ export default class ElectronAuth0Login {
                     return this.tokenProperties.access_token;
 
                 } catch (err) {
-                    console.warn('electron-auth0-login: could not use refresh token, may have been revoked');
+                    console.warn(
+                        'electron-auth0-login: could not use refresh token, may have been revoked',
+                        err,
+                    )
+                    if (err.name === 'RequestError') throw err
                     keytar.deletePassword(this.config.applicationName, 'refresh-token');
                     return this.login();
                 }

@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -13,7 +32,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const codependency_1 = __importDefault(require("codependency"));
-const electron_1 = require("electron");
+const electron = __importStar(require("electron"));
 const qs_1 = __importDefault(require("qs"));
 const request_promise_native_1 = __importDefault(require("request-promise-native"));
 const url_1 = __importDefault(require("url"));
@@ -81,7 +100,7 @@ class ElectronAuth0Login {
     }
     sendRefreshToken(refreshToken) {
         return __awaiter(this, void 0, void 0, function* () {
-            return request_promise_native_1.default(`https://${this.config.auth0Domain}/oauth/token`, {
+            return (0, request_promise_native_1.default)(`https://${this.config.auth0Domain}/oauth/token`, {
                 method: 'POST',
                 json: true,
                 body: {
@@ -94,7 +113,7 @@ class ElectronAuth0Login {
     }
     login() {
         return __awaiter(this, void 0, void 0, function* () {
-            const pkcePair = cryptoUtils_1.getPKCEChallengePair();
+            const pkcePair = (0, cryptoUtils_1.getPKCEChallengePair)();
             const authCode = yield this.getAuthCode(pkcePair);
             this.tokenProperties = yield this.exchangeAuthCodeForToken(authCode, pkcePair);
             if (this.useRefreshToken && this.tokenProperties.refresh_token) {
@@ -107,7 +126,7 @@ class ElectronAuth0Login {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
                 const authCodeUrl = `https://${this.config.auth0Domain}/authorize?` + qs_1.default.stringify(Object.assign({ audience: this.config.auth0Audience, scope: this.config.auth0Scopes, response_type: 'code', client_id: this.config.auth0ClientId, code_challenge: pkcePair.challenge, code_challenge_method: 'S256', redirect_uri: `https://${this.config.auth0Domain}/mobile` }, this.config.auth0Params));
-                const authWindow = new electron_1.remote.BrowserWindow(this.windowConfig);
+                const authWindow = new electron.BrowserWindow(this.windowConfig);
                 authWindow.webContents.on('did-navigate', (event, href) => {
                     const location = url_1.default.parse(href);
                     if (location.pathname == '/mobile') {
@@ -123,7 +142,7 @@ class ElectronAuth0Login {
     }
     exchangeAuthCodeForToken(authCode, pkcePair) {
         return __awaiter(this, void 0, void 0, function* () {
-            return request_promise_native_1.default(`https://${this.config.auth0Domain}/oauth/token`, {
+            return (0, request_promise_native_1.default)(`https://${this.config.auth0Domain}/oauth/token`, {
                 method: 'POST',
                 json: true,
                 body: {

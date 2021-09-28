@@ -1,5 +1,5 @@
 import codependency from 'codependency';
-import { remote } from 'electron';
+import * as electron from 'electron';
 import qs from 'qs';
 import request from 'request-promise-native';
 import url from 'url';
@@ -141,7 +141,7 @@ export default class ElectronAuth0Login {
                 ...this.config.auth0Params
             });
 
-            const authWindow = new remote.BrowserWindow(this.windowConfig);
+            const authWindow = new electron.BrowserWindow(this.windowConfig);
     
             authWindow.webContents.on('did-navigate' as any, (event: any, href: string) => {
                 const location = url.parse(href);
